@@ -29,7 +29,7 @@ public class PasteSitesSearch {
             //mySQLUtils.insertPatternWithShortName(sp.getPattern());
             sp.setPattern(mySQLUtils.readPatternFromDB());
             //System.out.println(sp.getPattern().size());
-            PasteSiteRunnable pasteSiteRunnable = new PasteSiteRunnable("https://www.pastebin.com", sp, 30, 5, mySQLUtils);
+            PasteSiteRunnable pasteSiteRunnable = new PasteSiteRunnable("https://www.pastebin.com", "https://www.pastebin.com/raw", sp, 30, 5, mySQLUtils);
             Thread t = new Thread(pasteSiteRunnable);
             t.start();
             //pasteSiteThread.run();

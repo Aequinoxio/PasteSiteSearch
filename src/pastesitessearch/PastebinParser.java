@@ -5,16 +5,9 @@
  */
 package pastesitessearch;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +17,7 @@ import org.jsoup.select.Elements;
  *
  * @author utente
  */
-public class PastebinParser implements SiteParser {
+public class PastebinParser extends SiteParserCommon {
 
     Set<String> pasteBinArchive = new HashSet<>();
     private String pasteSiteUrl;
@@ -34,30 +27,15 @@ public class PastebinParser implements SiteParser {
     String archiveUrlString = "https://pastebin.com/archive";
     String rawUrlString = "https://pastebin.com/raw";
 
-    public PastebinParser(String site, SearchingPattern searchingPattern) {
+    public PastebinParser(String site, String rawUrlString, SearchingPattern searchingPattern) {
+        super(site, rawUrlString, searchingPattern);
         this.searchingPattern=searchingPattern;
         this.pasteSiteUrl=site;
+        this.rawUrlString=rawUrlString;
     }
 
-    private String getPage(String remoteUrl) throws MalformedURLException, IOException {
-        URL url = new URL(remoteUrl);
-        URLConnection conn = url.openConnection();
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-
-        return (sb.toString());
-    }
-
-    @Override
-    public void openConnection() throws MalformedURLException, IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        
-//        URL url = new URL(archiveUrlString);
+//    private String getPage(String remoteUrl) throws MalformedURLException, IOException {
+//        URL url = new URL(remoteUrl);
 //        URLConnection conn = url.openConnection();
 //
 //        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -67,13 +45,30 @@ public class PastebinParser implements SiteParser {
 //            sb.append(line);
 //        }
 //
-//        String page = sb.toString();
-    }
+//        return (sb.toString());
+//    }
 
-    @Override
-    public void closeConnection() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+//    @Override
+//    public void openConnection() throws MalformedURLException, IOException {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//        
+////        URL url = new URL(archiveUrlString);
+////        URLConnection conn = url.openConnection();
+////
+////        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+////        StringBuilder sb = new StringBuilder();
+////        String line = null;
+////        while ((line = br.readLine()) != null) {
+////            sb.append(line);
+////        }
+////
+////        String page = sb.toString();
+//    }
+
+//    @Override
+//    public void closeConnection() {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
 
     @Override
     public Set<String> getAndParsedArchivePage() throws IOException {
@@ -109,48 +104,50 @@ public class PastebinParser implements SiteParser {
         return pasteBinArchive;
     }
 
-    @Override
-    public String getRemoteContent(String remoteID) throws IOException {
-        this.remoteID = remoteID;
-        String urlString = rawUrlString + remoteID;
-        lastContentPage=getPage(urlString);
-        return (lastContentPage);
-    }
+//    @Override
+//    public String getRemoteContent(String remoteID) throws IOException {
+//        this.remoteID = remoteID;
+//        String urlString = rawUrlString + remoteID;
+//        lastContentPage=getPage(urlString);
+//        return (lastContentPage);
+//    }
 
     // Pattern che sono stati matchati
     private Set<String> patterns_matched;
     
-    @Override
-    public boolean parseContentPage(String remoteID) throws IOException {
-        Set<Pattern> patterns = searchingPattern.getPattern().keySet();
-        patterns_matched=new HashSet<>();
-        boolean retval = false;
-        getRemoteContent(remoteID);
-        for (Pattern p : patterns) {
-            Matcher m = p.matcher(lastContentPage);
-            while (m.find()) {
-                // TODO: Tenere conto dei match per formare un indice rappresentativo di cosa è stato trovato
-                // Ad esempio numero matches/tot matches
-                patterns_matched.add(p.toString());
-                retval = true;
-            }
-        }
+//    @Override
+//    public boolean parseContentPage(String remoteID) throws IOException {
+//        Set<Pattern> patterns = searchingPattern.getPattern().keySet();
+//        patterns_matched=new HashSet<>();
+//        boolean retval = false;
+//        getRemoteContent(remoteID);
+//        for (Pattern p : patterns) {
+//            Matcher m = p.matcher(lastContentPage);
+//            while (m.find()) {
+//                // TODO: Tenere conto dei match per formare un indice rappresentativo di cosa è stato trovato
+//                // Ad esempio numero matches/tot matches
+//                patterns_matched.add(p.toString());
+//                retval = true;
+//            }
+//        }
+//
+//        return (retval);
+//    }
 
-        return (retval);
-    }
+//    @Override
+//    public String getLastContent() {
+//        return (lastContentPage);
+//    }
+//
+//    @Override
+//    public String getLastRemoteIdParsed() {
+//        return (remoteID);
+//    }
+//
+//    @Override
+//    public Set<String> getMatchedPatterns() {
+//        return patterns_matched;
+//    }
 
-    @Override
-    public String getLastContent() {
-        return (lastContentPage);
-    }
 
-    @Override
-    public String getLastRemoteIdParsed() {
-        return (remoteID);
-    }
-
-    @Override
-    public Set<String> getPatterns_matched() {
-        return patterns_matched;
-    }
 }

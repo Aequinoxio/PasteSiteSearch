@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 public class PasteSiteRunnable implements Runnable {
 
     private String pasteSiteUrl;
+    private String pastSiteRawContent;
     SearchingPattern searchingPattern;
     int sleepTimeout;
     int queryTimeout;
@@ -38,7 +39,7 @@ public class PasteSiteRunnable implements Runnable {
         return pasteSiteUrl;
     }
 
-    public PasteSiteRunnable(String pasteSite, SearchingPattern searchingPattern, int sleepTimeout, int queryTimeout, MySQLUtils mySQLUtils) {
+    public PasteSiteRunnable(String pasteSite, String pastSiteRawContent, SearchingPattern searchingPattern, int sleepTimeout, int queryTimeout, MySQLUtils mySQLUtils) {
         this.pasteSiteUrl = pasteSite;
         this.searchingPattern = searchingPattern;
         this.sleepTimeout = sleepTimeout;
@@ -48,7 +49,7 @@ public class PasteSiteRunnable implements Runnable {
 
     @Override
     public void run() {
-        SiteParser pastebin = new PastebinParser(pasteSiteUrl, searchingPattern);
+        SiteParser pastebin = new PastebinParser(pasteSiteUrl,pastSiteRawContent, searchingPattern);
         while (!haveToQuit) {
             try {
                 doAction(pastebin);
@@ -87,7 +88,7 @@ public class PasteSiteRunnable implements Runnable {
                 System.out.println("\tSaving data in DB");
                 // fine DEBUG
                 mySQLUtils.insertPasteIntoDB(id, siteParser.getLastContent(), pasteSiteUrl, 2);
-                mySQLUtils.insertMatchRelation(id,pasteSiteUrl , siteParser.getPatterns_matched());
+                mySQLUtils.insertMatchRelation(id,pasteSiteUrl , siteParser.getMatchedPatterns());
             } else {
                 System.out.println("\tNo useful information found");
             }

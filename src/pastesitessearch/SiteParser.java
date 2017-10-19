@@ -15,9 +15,9 @@ import java.util.Set;
  */
 public interface SiteParser {
 
-    public void openConnection() throws MalformedURLException, IOException, InstantiationException ;
-    
-    public void closeConnection();
+//    public void openConnection() throws MalformedURLException, IOException, InstantiationException ;
+//    
+//    public void closeConnection();
     
     /**
      * The implementation should get a set of remote paste site's archive IDs
@@ -61,6 +61,6 @@ public interface SiteParser {
      * Ritorna l'insieme dei pattern matchati
      * @return 
      */
-    public Set<String> getPatterns_matched();
+    public Set<String> getMatchedPatterns();
 
 }

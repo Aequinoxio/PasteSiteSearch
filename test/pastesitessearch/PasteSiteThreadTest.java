@@ -12,9 +12,8 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  *
@@ -72,15 +71,17 @@ public class PasteSiteThreadTest {
     public void testDoAction() throws Exception {
         MySQLUtils mySQLUtils = new MySQLUtils();
         String pasteSiteUrl="https://www.pastebin.com";
+        String pasteSiteRawUrl="https://www.pastebin.com/raw";
         SearchingPattern searchingPattern = SearchingPattern.getInstance();
-        SiteParser siteParser = new PastebinParser(pasteSiteUrl, searchingPattern);
+        SiteParser siteParser = new PastebinParser(pasteSiteUrl, pasteSiteRawUrl, searchingPattern);
+      //  PastebinParser siteParser = new PastebinParser(pasteSiteUrl, pasteSiteRawUrl, searchingPattern);
 
         try {
             mySQLUtils.startDBConnection();
             //mySQLUtils.insertPatternWithShortName(sp.getPattern());
             searchingPattern.setPattern(mySQLUtils.readPatternFromDB());
             //System.out.println(sp.getPattern().size());
-            PasteSiteRunnable pasteSiteThread = new PasteSiteRunnable("https://www.pastebin.com", searchingPattern, 30, 10, mySQLUtils);
+            PasteSiteRunnable pasteSiteThread = new PasteSiteRunnable("https://www.pastebin.com", pasteSiteRawUrl, searchingPattern, 30, 10, mySQLUtils);
             pasteSiteThread.doAction(siteParser);
         } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(PasteSitesSearch.class.getName()).log(Level.SEVERE, null, ex);
@@ -92,5 +93,4 @@ public class PasteSiteThreadTest {
             }
         }
     }
-
 }
