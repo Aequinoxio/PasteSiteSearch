@@ -62,5 +62,17 @@ public interface SiteParser {
      * @return 
      */
     public Set<String> getMatchedPatterns();
+    
+    /**
+     * Ritorna l'url del sito
+     * @return 
+     */
+    public String pasteSiteUrl();
+    
+    /**
+     * Ritorna l'url del sito che mostra il contenuto raw del paste
+     * @return 
+     */
+    public String pastSiteRawContentUrl();
 
 }

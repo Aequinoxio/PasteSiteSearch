@@ -19,12 +19,13 @@ import java.util.logging.Logger;
 public class PasteSiteRunnable implements Runnable {
 
     private String pasteSiteUrl;
-    private String pastSiteRawContent;
+  //  private String pastSiteRawContent;
     SearchingPattern searchingPattern;
     int sleepTimeout;
     int queryTimeout;
     boolean haveToQuit = false;
     MySQLUtils mySQLUtils;
+    private SiteParser siteParser;
 
     public void haveToQuit() {
         this.haveToQuit = true;
@@ -39,20 +40,30 @@ public class PasteSiteRunnable implements Runnable {
         return pasteSiteUrl;
     }
 
-    public PasteSiteRunnable(String pasteSite, String pastSiteRawContent, SearchingPattern searchingPattern, int sleepTimeout, int queryTimeout, MySQLUtils mySQLUtils) {
-        this.pasteSiteUrl = pasteSite;
-        this.searchingPattern = searchingPattern;
+//    public PasteSiteRunnable(String pasteSite, String pastSiteRawContent, SearchingPattern searchingPattern, int sleepTimeout, int queryTimeout, MySQLUtils mySQLUtils) {
+//        this.pasteSiteUrl = pasteSite;
+//        this.searchingPattern = searchingPattern;
+//        this.sleepTimeout = sleepTimeout;
+//        this.queryTimeout = queryTimeout;
+//        this.mySQLUtils = mySQLUtils;
+//    }
+
+    public PasteSiteRunnable (SiteParser siteParser, int sleepTimeout, int queryTimeout, MySQLUtils mySQLUtils) {
+        this.pasteSiteUrl = siteParser.pasteSiteUrl();        
+        this.siteParser = siteParser;
         this.sleepTimeout = sleepTimeout;
         this.queryTimeout = queryTimeout;
         this.mySQLUtils = mySQLUtils;
+    
     }
-
+    
     @Override
     public void run() {
-        SiteParser pastebin = new PastebinParser(pasteSiteUrl,pastSiteRawContent, searchingPattern);
+       // SiteParser pastebin = new PastebinParser(pasteSiteUrl,pastSiteRawContent, searchingPattern);
+        System.out.println("PasteSite Thread started: "+pasteSiteUrl);
         while (!haveToQuit) {
             try {
-                doAction(pastebin);
+                doAction(siteParser);
                 // Main sleep between two archive grab sessions
                 Thread.sleep(sleepTimeout * 1000);
                 // DEBUG
@@ -62,7 +73,7 @@ public class PasteSiteRunnable implements Runnable {
                 Logger.getLogger(PasteSiteRunnable.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("Esco");
+        System.out.println("PasteSite Thread ended."+pasteSiteUrl);
     }
 
     protected void doAction(SiteParser siteParser) throws IOException, SQLException, InterruptedException {
@@ -76,10 +87,12 @@ public class PasteSiteRunnable implements Runnable {
 
         Set<String> pasteSiteArchiveToBeRead = mySQLUtils.insertRemoteIDIntoDB(pasteSiteArchive, pasteSiteUrl);
 
+        System.out.println("Reading: "+pasteSiteArchiveToBeRead.size());
+        int counter=0;
         for (String id : pasteSiteArchiveToBeRead) {
             //siteParser.getRemoteContent(id);
 
-            System.out.print(String.format("Retrieving remote ID: %s", id));
+            System.out.print(String.format("%02d - Retrieving remote ID: %s",counter++, id));
 
             // TODO: Trattare il caso di eccezione filenot found che rappresenta una pagina non più raggiungibile
             if (siteParser.parseContentPage(id)) {
@@ -88,7 +101,7 @@ public class PasteSiteRunnable implements Runnable {
                 System.out.println("\tSaving data in DB");
                 // fine DEBUG
                 mySQLUtils.insertPasteIntoDB(id, siteParser.getLastContent(), pasteSiteUrl, 2);
-                mySQLUtils.insertMatchRelation(id,pasteSiteUrl , siteParser.getMatchedPatterns());
+                mySQLUtils.insertMatchRelation(id, pasteSiteUrl, siteParser.getMatchedPatterns());
             } else {
                 System.out.println("\tNo useful information found");
             }
@@ -97,45 +110,4 @@ public class PasteSiteRunnable implements Runnable {
             Thread.sleep(queryTimeout*1000);
         }
     }
-
-//    private Set<String> getPasteSiteArchives() throws MalformedURLException, IOException, InstantiationException {
-//        Set<String> pasteBinArchive = new HashSet<>();
-//
-//        //String urlString = "https://pastebin.com/archive";
-//        URL url = new URL(pasteSiteUrl);
-//        URLConnection conn = url.openConnection();
-//
-//        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//        StringBuilder sb = new StringBuilder();
-//        String line = null;
-//        while ((line = br.readLine()) != null) {
-//            sb.append(line);
-//        }
-//
-//        String page = sb.toString();
-//        Document docum;
-//        docum = Jsoup.parse(page);
-//        // TODO: irrobustire la sezione per verificare se la pagina che viene ritornata è del tipo che mi aspetto
-//        Element table;
-//        table = docum.getElementsByClass("maintable").first();
-//        if (table==null)
-//            return null;
-//        
-//        Elements rows = table.select("tr");
-//
-//        for (Element row : rows) {
-//            Elements cols = row.select("td");
-//            if (cols.size() == 0) {
-//                continue;
-//            }
-//
-//            Element col = cols.get(0);
-//            Element href = col.select("a[href]").get(0);
-//            String link = href.attr("href");
-//            //System.out.println(link);
-//            pasteBinArchive.add(link);
-//        }
-//
-//        return pasteBinArchive;
-//    }
 }

@@ -7,7 +7,9 @@ package pastesitessearch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -21,27 +23,38 @@ import java.util.regex.Pattern;
  * @author utente
  */
 public abstract class SiteParserCommon implements SiteParser {
-    
-    private String pasteSiteUrl;
+
+    protected final String pasteSiteUrl;
     SearchingPattern searchingPattern;
     String lastContentPage;
     String remoteID;
-    private final String rawUrlString;
+    protected final String rawUrlString;
     // Pattern che sono stati matchati
     private Set<String> patterns_matched;
 
-
     public SiteParserCommon(String site, String rawContentUrl, SearchingPattern searchingPattern) {
-        this.searchingPattern=searchingPattern;
-        this.pasteSiteUrl=site;
-        this.rawUrlString=rawContentUrl;
+        this.searchingPattern = searchingPattern;
+        this.pasteSiteUrl = site;
+        this.rawUrlString = rawContentUrl;
     }
 
     protected String getPage(String remoteUrl) throws MalformedURLException, IOException {
         URL url = new URL(remoteUrl);
         URLConnection conn = url.openConnection();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        InputStream remoteData=null;
+        try {
+            remoteData = conn.getInputStream();
+        } catch (Exception ioe) {
+            if (conn instanceof HttpURLConnection) {
+                HttpURLConnection httpConn = (HttpURLConnection) conn;
+                int statusCode = httpConn.getResponseCode();
+                if (statusCode != 200) {
+                    remoteData= httpConn.getErrorStream();
+                }
+            }
+        }
+        BufferedReader br = new BufferedReader(new InputStreamReader(remoteData));
         StringBuilder sb = new StringBuilder();
         String line = null;
         while ((line = br.readLine()) != null) {
@@ -50,19 +63,21 @@ public abstract class SiteParserCommon implements SiteParser {
 
         return (sb.toString());
     }
-  
-    public abstract Set<String> getAndParsedArchivePage() throws IOException ;
-    
+
+    public abstract Set<String> getAndParsedArchivePage() throws IOException;
+
+    @Override
     public String getRemoteContent(String remoteID) throws IOException {
         this.remoteID = remoteID;
         String urlString = rawUrlString + remoteID;
-        lastContentPage=getPage(urlString);
+        lastContentPage = getPage(urlString);
         return (lastContentPage);
     }
-      
+
+    @Override
     public boolean parseContentPage(String remoteID) throws IOException {
         Set<Pattern> patterns = searchingPattern.getPattern().keySet();
-        patterns_matched=new HashSet<>();
+        patterns_matched = new HashSet<>();
         boolean retval = false;
         getRemoteContent(remoteID);
         for (Pattern p : patterns) {
@@ -77,16 +92,26 @@ public abstract class SiteParserCommon implements SiteParser {
 
         return (retval);
     }
-    
+
     public String getLastContent() {
         return (lastContentPage);
     }
-   
+
     public String getLastRemoteIdParsed() {
         return (remoteID);
     }
-   
+
     public Set<String> getMatchedPatterns() {
         return patterns_matched;
+    }
+    
+    @Override
+    public String pasteSiteUrl() {
+        return pasteSiteUrl;
+    }
+
+    @Override
+    public String pastSiteRawContentUrl() {
+        return rawUrlString;
     }
 }

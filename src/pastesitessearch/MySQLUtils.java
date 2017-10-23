@@ -39,7 +39,7 @@ public class MySQLUtils {
     private final String selectPatternId_Part1= " select id from patterns where pattern = ? ";
     private final String selectPatternId_Part2= " or pattern = ? ";
     private final String selectPastesID = "select id from pastes where paste_remote_id = ? and site = ?";
-    private final String insertRelation = "insert into matches (idPaste , idPattern ) values (?, ?)";
+    private final String insertRelation = "insert ignore into matches (idPaste , idPattern ) values (?, ?)";
     //private final String updatePasteValuesQuery = "update paste";
 
     private final String USERNAME = "utente";
@@ -47,7 +47,7 @@ public class MySQLUtils {
 
     private Connection conn = null;
 
-    public void startDBConnection() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+    public synchronized void startDBConnection() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
 
         Properties connProperties = new Properties();
@@ -60,7 +60,7 @@ public class MySQLUtils {
      *
      * @param kv Map of pattern and related short name
      */
-    public void insertPatternWithShortNameIntoDB(Map<Pattern, String> kv) throws SQLException {
+    public synchronized void insertPatternWithShortNameIntoDB(Map<Pattern, String> kv) throws SQLException {
 
         PreparedStatement statement = conn.prepareStatement(insertPatternQuery);
         for (Pattern p : kv.keySet()) {
@@ -96,7 +96,7 @@ public class MySQLUtils {
      * @param status The status of the pasted text (see db status table)
      * @throws SQLException
      */
-    public void insertPasteIntoDB(String remoteID, String pasteText, String pasteSite, int status) throws SQLException {
+    public synchronized void insertPasteIntoDB(String remoteID, String pasteText, String pasteSite, int status) throws SQLException {
         String query = insertPasteQuery;
 
         if (checkRemoteIDInDBPastes(remoteID, pasteSite)) {
@@ -122,7 +122,7 @@ public class MySQLUtils {
      * Insert a set of temote ID into DB. Return the remote IDs effectively
      * inserted (not present in DB)
      */
-    public Set<String> insertRemoteIDIntoDB(Set<String> remoteIDSet, String pasteSite) throws SQLException {
+    public synchronized Set<String> insertRemoteIDIntoDB(Set<String> remoteIDSet, String pasteSite) throws SQLException {
         Set<String> temp = new HashSet<String>();
         PreparedStatement preparedStatement = null;
         preparedStatement = conn.prepareStatement(insertRemoteIDQuery);
@@ -245,12 +245,14 @@ public class MySQLUtils {
 
     }
 
-    public void closeDBConnection() throws SQLException {
+    public synchronized void closeDBConnection() throws SQLException {
         // conn.commit();  // Se autocommit è false decommentare la linea
         conn.close();
     }
     
-    public void insertMatchRelation(String remoteID, String site, Set<String> patterns) throws SQLException{
+    public synchronized void insertMatchRelation(String remoteID, String site, Set<String> patterns) throws SQLException{
+        
+        // Recupero i pattern dal DB
         StringBuilder sb = new StringBuilder(selectPatternId_Part1);
         // Aggiungo tante clausole in OR quanti sono i pattern
         for (int i =0 ; i<patterns.size()-1;i++){
@@ -267,8 +269,7 @@ public class MySQLUtils {
             preparedStatement.setString(counter, p);           
             counter++;
         }
-        ResultSet rsIDPattern = preparedStatement.executeQuery();
-        //preparedStatement.close();
+        ResultSet rsIDPattern = preparedStatement.executeQuery();       
         
         // Recupero l'id associato a remoteID e site dalla tabella pastes
         PreparedStatement preparedStatement2 = conn.prepareStatement(selectPastesID);
@@ -276,8 +277,8 @@ public class MySQLUtils {
         preparedStatement2.setString(2, site);
         // Dovrebbe essercene solo uno (chiave primaria composita remoteID+Site
         ResultSet rsIDRemoteID = preparedStatement2.executeQuery();
-        //preparedStatement.close();
         
+        // Aggiorno la tabella dei match
         int IDPattern=0;
         rsIDRemoteID.first();
         int IDremoteID=rsIDRemoteID.getInt(1);

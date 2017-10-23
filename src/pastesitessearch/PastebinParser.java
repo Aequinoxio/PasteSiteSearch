@@ -20,18 +20,18 @@ import org.jsoup.select.Elements;
 public class PastebinParser extends SiteParserCommon {
 
     Set<String> pasteBinArchive = new HashSet<>();
-    private String pasteSiteUrl;
+    //private String pasteSiteUrl;
     SearchingPattern searchingPattern;
     String lastContentPage;
     String remoteID;
     String archiveUrlString = "https://pastebin.com/archive";
-    String rawUrlString = "https://pastebin.com/raw";
+    //String rawUrlString = "https://pastebin.com/raw";
 
     public PastebinParser(String site, String rawUrlString, SearchingPattern searchingPattern) {
         super(site, rawUrlString, searchingPattern);
         this.searchingPattern=searchingPattern;
-        this.pasteSiteUrl=site;
-        this.rawUrlString=rawUrlString;
+        //this.pasteSiteUrl=site;
+        //this.rawUrlString=rawUrlString;
     }
 
 //    private String getPage(String remoteUrl) throws MalformedURLException, IOException {
@@ -112,8 +112,8 @@ public class PastebinParser extends SiteParserCommon {
 //        return (lastContentPage);
 //    }
 
-    // Pattern che sono stati matchati
-    private Set<String> patterns_matched;
+//    // Pattern che sono stati matchati
+//    private Set<String> patterns_matched;
     
 //    @Override
 //    public boolean parseContentPage(String remoteID) throws IOException {
@@ -147,6 +147,16 @@ public class PastebinParser extends SiteParserCommon {
 //    @Override
 //    public Set<String> getMatchedPatterns() {
 //        return patterns_matched;
+//    }
+
+//    @Override
+//    public String pasteSiteUrl() {
+//        return pasteSiteUrl;
+//    }
+//
+//    @Override
+//    public String pastSiteRawContentUrl() {
+//        return rawUrlString;
 //    }
 
 

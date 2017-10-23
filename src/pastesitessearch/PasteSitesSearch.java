@@ -29,22 +29,27 @@ public class PasteSitesSearch {
             //mySQLUtils.insertPatternWithShortName(sp.getPattern());
             sp.setPattern(mySQLUtils.readPatternFromDB());
             //System.out.println(sp.getPattern().size());
-            PasteSiteRunnable pasteSiteRunnable = new PasteSiteRunnable("https://www.pastebin.com", "https://www.pastebin.com/raw", sp, 30, 5, mySQLUtils);
-            Thread t = new Thread(pasteSiteRunnable);
-            t.start();
-            //pasteSiteThread.run();
-            System.out.println(String.format("Time: %s", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())));
-            Thread.currentThread().sleep(1 * 60 * 1000); // Aspetto un po' e poi mi fermo
+            SiteParser pasteBinParser = new PastebinParser("https://www.pastebin.com", "https://www.pastebin.com/raw", sp);
+            PasteSiteRunnable pasteSiteRunnablePastebin = new PasteSiteRunnable(pasteBinParser, 30, 5, mySQLUtils);
+            Thread tPastebin = new Thread(pasteSiteRunnablePastebin);
+            tPastebin.start();
             
-            System.out.println(String.format("Time: %s", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())));
-            pasteSiteRunnable.haveToQuit();
-            
-            Thread.currentThread().sleep(5 * 60 * 1000); // Aspetto 4 minuti e poi mi fermo definitivamente per far completare i thread
-            System.out.println(String.format("Time: %s", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())));
-            
-        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(PasteSitesSearch.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
+            SiteParser slexyParser = new SlexyParser("https://slexy.org/", "https://slexy.org", sp);
+            PasteSiteRunnable pasteSiteRunnableSlexy = new PasteSiteRunnable(slexyParser, 30, 5, mySQLUtils);
+            Thread tSlexy = new Thread(pasteSiteRunnableSlexy);
+            tSlexy.start();
+
+            System.out.println(String.format("All threads started @: %s\n\tNow sleeping", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())));
+            Thread.sleep(1 * 60 * 1000); // Aspetto un po' e poi mi fermo
+
+            System.out.println(String.format("Yawn, waked up @: %s\n\tSend quit command", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())));
+            pasteSiteRunnablePastebin.haveToQuit();
+            pasteSiteRunnableSlexy.haveToQuit();
+
+            Thread.sleep(5 * 60 * 1000); // Aspetto 5 minuti e poi mi fermo definitivamente per far completare i thread
+            System.out.println(String.format("Done @: %s", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())));
+
+        } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException | InterruptedException ex) {
             Logger.getLogger(PasteSitesSearch.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
