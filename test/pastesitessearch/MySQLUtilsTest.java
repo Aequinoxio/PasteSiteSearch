@@ -51,7 +51,7 @@ public class MySQLUtilsTest {
     public void testStartDBConnection() throws Exception {
         System.out.println("startDBConnection");
         MySQLUtils instance = new MySQLUtils();
-        instance.startDBConnection();
+        instance.startDBConnection("utente".toCharArray(),"utente".toCharArray());
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }
@@ -97,7 +97,7 @@ public class MySQLUtilsTest {
         String pasteSite = "TEST_TO_DEL_ROWS_WITH_THIS_VALUE";
         int status = 1;
         MySQLUtils instance = new MySQLUtils();
-        instance.startDBConnection();
+        instance.startDBConnection("utente".toCharArray(),"utente".toCharArray());
         instance.insertPasteIntoDB(remoteID, pasteText, pasteSite, status);
         instance.closeDBConnection();
         // TODO review the generated test code and remove the default call to fail.
@@ -119,7 +119,7 @@ public class MySQLUtilsTest {
         remoteIDSet.add("/BFWJxZZK_ARITODEL");
         String pasteSite = "TEST_TO_DEL_ROWS_WITH_THIS_VALUE";
         MySQLUtils instance = new MySQLUtils();
-        instance.startDBConnection();
+        instance.startDBConnection("utente".toCharArray(),"utente".toCharArray());
         Set<String> expResult = new HashSet<String>();
 
         expResult.add("/BFWJxZZK_TODEL");
@@ -195,7 +195,7 @@ public class MySQLUtilsTest {
         patterns.add(itP.next().toString());
         
         MySQLUtils instance = new MySQLUtils();
-        instance.startDBConnection();
+        instance.startDBConnection("utente".toCharArray(),"utente".toCharArray());
         instance.insertMatchRelation(remoteID, site, patterns);
 //        boolean expResult = false;
 //        assertEquals(expResult, result);

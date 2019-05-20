@@ -77,11 +77,12 @@ public class PasteSiteThreadTest {
       //  PastebinParser siteParser = new PastebinParser(pasteSiteUrl, pasteSiteRawUrl, searchingPattern);
 
         try {
-            mySQLUtils.startDBConnection();
+            mySQLUtils.startDBConnection("utente".toCharArray(),"utente".toCharArray());
             //mySQLUtils.insertPatternWithShortName(sp.getPattern());
             searchingPattern.setPattern(mySQLUtils.readPatternFromDB());
             //System.out.println(sp.getPattern().size());
-            PasteSiteRunnable pasteSiteThread = new PasteSiteRunnable("https://www.pastebin.com", pasteSiteRawUrl, searchingPattern, 30, 10, mySQLUtils);
+           // PasteSiteRunnable pasteSiteThread = new PasteSiteRunnable("https://www.pastebin.com", pasteSiteRawUrl, searchingPattern, 30, 10, mySQLUtils);
+            PasteSiteRunnable pasteSiteThread = new PasteSiteRunnable(siteParser, 30, 10, mySQLUtils);
             pasteSiteThread.doAction(siteParser);
         } catch (SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(PasteSitesSearch.class.getName()).log(Level.SEVERE, null, ex);

@@ -23,6 +23,7 @@ public interface SiteParser {
      * The implementation should get a set of remote paste site's archive IDs
      *
      * @return the java.util.Set<java.lang.String>
+     * @throws java.net.MalformedURLException
      */
     public Set<String> getAndParsedArchivePage() throws MalformedURLException, IOException;
 
@@ -33,6 +34,7 @@ public interface SiteParser {
      * @param remoteID
      *
      * @return The page's contents
+     * @throws java.net.MalformedURLException
      */
     public String getRemoteContent(String remoteID) throws MalformedURLException, IOException;
 
@@ -40,6 +42,7 @@ public interface SiteParser {
      * Parse the page referred by ID
      * @param remoteID the value of emoteID
      * @return the boolean
+     * @throws java.net.MalformedURLException
      */
     public boolean parseContentPage(String remoteID) throws MalformedURLException, IOException;
 

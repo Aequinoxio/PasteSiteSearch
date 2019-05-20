@@ -7,7 +7,6 @@ package pastesitessearch;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,15 +17,18 @@ import java.util.logging.Logger;
  */
 public class PasteSiteRunnable implements Runnable {
 
-    private String pasteSiteUrl;
+    private final String pasteSiteUrl;
+    private final SiteParser siteParser;
   //  private String pastSiteRawContent;
     SearchingPattern searchingPattern;
     int sleepTimeout;
     int queryTimeout;
     boolean haveToQuit = false;
     MySQLUtils mySQLUtils;
-    private SiteParser siteParser;
 
+    /**
+     * Tell the thread to quit as the pendig work finish
+     */
     public void haveToQuit() {
         this.haveToQuit = true;
     }
@@ -48,6 +50,13 @@ public class PasteSiteRunnable implements Runnable {
 //        this.mySQLUtils = mySQLUtils;
 //    }
 
+    /**
+     * Constructor
+     * @param siteParser Parser that is applied to the specific site that this class represents
+     * @param sleepTimeout Timeout between two whole query run 
+     * @param queryTimeout Timeout between two queries
+     * @param mySQLUtils Utility for MySQL database
+     */
     public PasteSiteRunnable (SiteParser siteParser, int sleepTimeout, int queryTimeout, MySQLUtils mySQLUtils) {
         this.pasteSiteUrl = siteParser.pasteSiteUrl();        
         this.siteParser = siteParser;
@@ -57,6 +66,9 @@ public class PasteSiteRunnable implements Runnable {
     
     }
     
+    /**
+     * Do the thread job
+     */
     @Override
     public void run() {
        // SiteParser pastebin = new PastebinParser(pasteSiteUrl,pastSiteRawContent, searchingPattern);
@@ -65,7 +77,7 @@ public class PasteSiteRunnable implements Runnable {
             try {
                 doAction(siteParser);
                 // Main sleep between two archive grab sessions
-                Thread.sleep(sleepTimeout * 1000);
+                Thread.sleep(sleepTimeout * 1000L);
                 // DEBUG
                 System.out.println(String.format("run done... sleeping %d sec.", sleepTimeout));
                 // END DEBUG
@@ -76,8 +88,16 @@ public class PasteSiteRunnable implements Runnable {
         System.out.println("PasteSite Thread ended."+pasteSiteUrl);
     }
 
+    /**
+     * Do the effective thread work
+     * @param siteParser The parser for a specific Site
+     * @throws IOException
+     * @throws SQLException
+     * @throws InterruptedException 
+     */
     protected void doAction(SiteParser siteParser) throws IOException, SQLException, InterruptedException {
-        Set<String> pasteSiteArchive = new HashSet<>();
+        // Set<String> pasteSiteArchive = new HashSet<>();
+        Set<String> pasteSiteArchive ;
 
         // TODO: check duplicati e loro rimozione
         pasteSiteArchive = siteParser.getAndParsedArchivePage();
@@ -107,7 +127,7 @@ public class PasteSiteRunnable implements Runnable {
             }
             
             // Aspetto un po' nel parsing tra una pagina e l'altra
-            Thread.sleep(queryTimeout*1000);
+            Thread.sleep(queryTimeout*1000L);
         }
     }
 }

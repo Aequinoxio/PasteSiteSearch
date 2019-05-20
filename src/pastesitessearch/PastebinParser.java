@@ -21,15 +21,21 @@ public class PastebinParser extends SiteParserCommon {
 
     Set<String> pasteBinArchive = new HashSet<>();
     //private String pasteSiteUrl;
-    SearchingPattern searchingPattern;
-    String lastContentPage;
-    String remoteID;
+ //   SearchingPattern searchingPattern;
+ //   String lastContentPage;
+ //   String remoteID;
     String archiveUrlString = "https://pastebin.com/archive";
     //String rawUrlString = "https://pastebin.com/raw";
 
-    public PastebinParser(String site, String rawUrlString, SearchingPattern searchingPattern) {
+    /**
+     * Constructor
+     * @param site The site that this class parses
+     * @param rawUrlString The url of the raw content that site expose
+     * @param searchingPattern The searching pattern object that is used to search things
+     */
+    PastebinParser(String site, String rawUrlString, SearchingPattern searchingPattern) {
         super(site, rawUrlString, searchingPattern);
-        this.searchingPattern=searchingPattern;
+        super.searchingPattern=searchingPattern;
         //this.pasteSiteUrl=site;
         //this.rawUrlString=rawUrlString;
     }

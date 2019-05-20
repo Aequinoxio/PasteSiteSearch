@@ -6,7 +6,6 @@
 package pastesitessearch;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import org.jsoup.Jsoup;
@@ -21,17 +20,23 @@ import org.jsoup.select.Elements;
 public class SlexyParser extends SiteParserCommon {
 
     Set<String> slexyArchive = new HashSet<>();
-    private String pasteSiteUrl;
-    SearchingPattern searchingPattern;
-    String lastContentPage;
-    String remoteID;
+//    private String pasteSiteUrl;
+//    SearchingPattern searchingPattern;
+    //String lastContentPage;
+//    String remoteID;
 //    String archiveUrlString = ""; // Non occorre in quanto faccio il parsing direttamente della pagina dei risultati
 //    String rawUrlString = "";
 
-    public SlexyParser(String site, String rawUrlString, SearchingPattern searchingPattern) {
+    /**
+     * Constructor
+     * @param site The site that this class parses
+     * @param rawUrlString The url of the raw content that site expose
+     * @param searchingPattern The searching pattern object that is used to search things
+     */
+    SlexyParser(String site, String rawUrlString, SearchingPattern searchingPattern) {
         super(site, rawUrlString, searchingPattern);
-        this.searchingPattern = searchingPattern;
-        this.pasteSiteUrl = site;
+//        this.searchingPattern = searchingPattern;
+//        this.pasteSiteUrl = site;
         //this.rawUrlString=rawUrlString;
     }
 
@@ -79,7 +84,7 @@ public class SlexyParser extends SiteParserCommon {
      * @throws IOException
      */
     private Set<String> parsePageWorker(String url) throws IOException {
-        Set<String> tmp = new HashSet<String>();
+        Set<String> tmp = new HashSet<>();
         String page = getPage(url);
 
         Document docum;
@@ -131,9 +136,11 @@ public class SlexyParser extends SiteParserCommon {
         Elements listaHtml = testoHtml.getElementsByTag("li");
 
         // Non leggo il raw ma parso l'html. Devo aggiornare lastContentPage
-        super.lastContentPage=listaHtml.text();
+        // Se non faccio l'overridind del campo potrebbe non essere necessario. 
+        // TODO: Da valutare se basta la chiamata a super.getRemoteContent per impostare il corretto valore in lastContentPage
+        lastContentPage=listaHtml.text();
         
-        return (super.lastContentPage);
+        return (lastContentPage);
     }
 
 //    @Override

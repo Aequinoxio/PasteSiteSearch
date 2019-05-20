@@ -33,7 +33,7 @@ class SearchingPattern {
      * Set inizial patterns
      */
     private SearchingPattern() {
-        pattern = new HashMap<Pattern,String>();
+        pattern = new HashMap<>();
                 
         pattern.put( Pattern.compile("gab.gal@gmail.com|procava@gmail.com|ordini.bianchi@gmail.com|coverctrl@gmail.com|gabriele.galluzzo@gmail.com|prokeprok@gmail.com|gabriele.galluzzo@ingpec.eu|gabriele_galluzzo@alice.it|tiziana.castellani@gmail.com", Pattern.CASE_INSENSITIVE),"email_specific");
         pattern.put(Pattern.compile(
